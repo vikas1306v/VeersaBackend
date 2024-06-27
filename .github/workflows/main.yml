@@ -28,4 +28,4 @@ jobs:
       with:
         context: .
         push: true
-        tags: vikas1306/dockerAppointmentApp:latest
+        tags: vikas1306/dockerappointmentapp:latest
