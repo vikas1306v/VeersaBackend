@@ -127,7 +127,8 @@ router.get('/getFreeSlot/:doctorId', async (req, res) => {
 
 //update doctor profile
 router.put('/updateProfile/:id', async (req, res) => {
-    const { mobileNumber,name,profileImage, address, longitude,lattitude } = req.body;
+    const { mobileNumber,name,profileImage, address, longitude,latitude } = req.body;
+    console.log(req.body)
     try{
         const doctor=await Doctor.findByIdAndUpdate(req.params.id,{
             mobileNumber:mobileNumber,
@@ -135,7 +136,7 @@ router.put('/updateProfile/:id', async (req, res) => {
             profileImage:profileImage,
             address:address,
             longitude:longitude,
-            lattitude:lattitude
+            latitude:latitude
         },{new:true});
         if(!doctor){
             return res.status(404).json({
@@ -155,7 +156,7 @@ router.put('/updateProfile/:id', async (req, res) => {
 })
 
 router.post('/add', async (req, res) => {
-    const { mobileNumber,name,profileImage, address, longitude,lattitude,category } = req.body;
+    const { mobileNumber,name,profileImage, address, longitude,latitude,category } = req.body;
     try {
         const doctor = new Doctor({
             mobileNumber: mobileNumber,
@@ -163,7 +164,7 @@ router.post('/add', async (req, res) => {
             profileImage:profileImage,
             address:address,
             longitude:longitude,
-            lattitude:lattitude,
+            latitude:latitude,
             category:category
         });
         await doctor.save();

@@ -47,7 +47,7 @@ router.post('/book', async (req, res) => {
 
         return res.status(200).json({
             message: "Booking successful",
-            booking: booking[0], // Assuming single booking is created, extract first element
+            booking: booking[0], 
             success: true
         });
     } catch (error) {
@@ -61,7 +61,6 @@ router.post('/book', async (req, res) => {
     }
 });
 
-//confirm booking from doctor side
 router.put('/confirmBooking/:id',async(req,res)=>{
     try{
         const booking=await Booking.findByIdAndUpdate(req.params.id,{
@@ -138,5 +137,21 @@ const doctorLocation={
       trigger: notificationTime,
     });
   };
-    
+router.get('/all/:doctorId',async(req,res)=>{
+    try{
+        const bookings=await Booking.find({
+            doctor:req.params.doctorId
+        });
+        const pending = bookings.filter(booking => booking.status === "pending");
+        const approved = bookings.filter(booking => booking.status === "approved");
+        return res.status(200).json({
+            pending:pending,
+            approved:approved,
+            success:true
+        });
+    }catch(e){
+        return res.status(400).json({message:e.message});
+    }
+}
+)
 module.exports=router;

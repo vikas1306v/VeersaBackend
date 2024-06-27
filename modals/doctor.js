@@ -30,7 +30,7 @@ const doctorSchema = new Schema({
   address: {
     type: String,
   },
-  lattitude:{
+  latitude:{
     type:Number,
   },
   longitude:{

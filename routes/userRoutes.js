@@ -1,10 +1,10 @@
 const express = require('express');
 const User = require('../modals/user.js');
 const router = express.Router();
-
+const Booking = require('../modals/booking.js');
 
 router.put("/update/:id", async (req, res) => {
-    const { mobileNumber,name,expoToken,profileImage, address, longitude,lattitude } = req.body;
+    const { mobileNumber,name,expoToken,profileImage, address, longitude,latitude } = req.body;
     try{
         const user=await User
         .findByIdAndUpdate(req.params.id,{
@@ -13,7 +13,7 @@ router.put("/update/:id", async (req, res) => {
             profileImage:profileImage,
             address:address,
             longitude:longitude,
-            lattitude:lattitude,
+            latitude:latitude,
             expoToken:expoToken
         },{new:true});
         if(!user){
@@ -77,6 +77,32 @@ router.get('/findNearestDoctors', async (req, res) => {
         });
     }
 });
-
+router.get("/bookings/all/:userId", async (req, res) => {
+    const { userId } = req.params;
+    //find  booking then make pending and approval
+    try {
+        const bookings = await Booking.find({ user: userId }).populate('doctor');
+        if (!bookings) {
+            return res.status(404).json({
+                message: "No bookings found",
+                success: false
+            });
+        }
+        const pending=bookings.filter(booking=>booking.status==="pending");
+        const approved=bookings.filter(booking=>booking.status==="approved");
+        return res.status(200).json({
+            message: "Bookings found successfully",
+            pending:pending,
+            approved:approved,
+            success: true
+        });
+    } catch (error) {
+        return res.status(500).json({
+            message: "Failed to find bookings",
+            error: error.message,
+            success: false
+        });
+    }
+});
 
 module.exports = router;
