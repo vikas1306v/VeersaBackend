@@ -4,7 +4,7 @@ const router = express.Router();
 
 
 router.put("/update/:id", async (req, res) => {
-    const { mobileNumber,name,profileImage, address, longitude,lattitude } = req.body;
+    const { mobileNumber,name,expoToken,profileImage, address, longitude,lattitude } = req.body;
     try{
         const user=await User
         .findByIdAndUpdate(req.params.id,{
@@ -13,7 +13,8 @@ router.put("/update/:id", async (req, res) => {
             profileImage:profileImage,
             address:address,
             longitude:longitude,
-            lattitude:lattitude
+            lattitude:lattitude,
+            expoToken:expoToken
         },{new:true});
         if(!user){
             return res.status(404).json({

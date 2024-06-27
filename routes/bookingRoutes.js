@@ -68,6 +68,7 @@ router.put('/confirmBooking/:id',async(req,res)=>{
             status:"approved",
             isBooked:true
         },{new:true});
+        sendNotification(booking);
         if(!booking){
             return res.status(404).json({
                 message:"Booking not found",
@@ -79,10 +80,63 @@ router.put('/confirmBooking/:id',async(req,res)=>{
             booking:booking,
             success:true
         });
+        
     }catch(e){
         return res.status(400).json({message:e.message});
     }
 }
 )
-
+const sendNotification=async (booking)=>{
+    const user=await User.findById(booking.user);
+    const expoToken=user.expoToken;
+    sendImmediateNotification(expoToken)
+    userLocation.latitude=user.latitude;
+    userLocation.longitude=user.longitude;
+    const doctor=await User.findById(booking.doctor);
+    doctorLocation.latitude=doctor.latitude;
+    doctorLocation.longitude=doctor.longitude;
+    scheduleNotification(booking.date,expoToken,userLocation,doctorLocation)
+    
+}
+const sendImmediateNotification = async (token) => {
+    await fetch('https://exp.host/--/api/v2/push/send', {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        to: token,
+        sound: 'default',
+        title: 'Appointment Confirmed',
+        body: 'Your appointment has been successfully booked.',
+        data: { someData: 'goes here' },
+      }),
+    });
+  };
+  const userLocation={
+        latitude:0,
+        longitude:0
+  }
+const doctorLocation={
+        latitude:0,
+        longitude:0
+}
+  const scheduleNotification = async (appointmentTime, token,userLocation,doctorLocation) => {
+    const appointmentDate = new Date(appointmentTime);
+    const notificationTime = new Date(appointmentDate.getTime() - 60 * 60 * 1000); // 1 hour before
+  
+    await Notifications.scheduleNotificationAsync({
+      content: {
+        title: "Appointment Reminder",
+        body: "Your appointment is in 1 hour."+
+        "This is a reminder for your appointment with Dr."+
+        "Here attached map link for your appointment location"+
+        `https://www.google.com/maps/dir/?api=1&origin=${userLocation.longitude},${userLocation.latitude}&destination=${doctorLocation.longitude},${doctorLocation.latitude}`,
+        sound: "default",
+      },
+      trigger: notificationTime,
+    });
+  };
+    
 module.exports=router;
