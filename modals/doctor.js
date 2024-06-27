@@ -1,7 +1,8 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-const userSchema = new Schema({
+
+const doctorSchema = new Schema({
   name: {
     type: String,
     required: true,
@@ -9,16 +10,15 @@ const userSchema = new Schema({
   profileImage: {
     type: String,
   },
+  role:{
+    type:String,
+    enum:["DOCTOR"],
+    default:"DOCTOR",
+    required:true,
+  },
   email: {
     type: String,
     required: true,
-  },
-  role:{
-    type:String,
-    enum:["USER"],
-    default:"USER",
-    required:true,
-
   },
   password: {
     type: String,
@@ -36,13 +36,9 @@ const userSchema = new Schema({
   longitude:{
     type:Number,
   },
-  expoToken:{
+  categoryId:{
     type:String,
   },
-  bookings:[{
-    type:Schema.Types.ObjectId,
-    ref:'Booking'
-  }],
   createdAt: {
     type: Date,
     default: Date.now,
@@ -51,4 +47,4 @@ const userSchema = new Schema({
   timestamps: true
 });
 
-module.exports = mongoose.model('User', userSchema);
+module.exports = mongoose.model('Doctor', doctorSchema);
